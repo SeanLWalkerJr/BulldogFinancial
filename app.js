@@ -55,17 +55,19 @@ app.get('/',(req,res) => {
     if(session.userid){
         res.send("Welcome User <a href=\'/logout'>click to logout</a>");
     }else
-    res.sendFile('views/signin.html',{root:__dirname})
+    //res.sendFile('views/signin.html',{root:__dirname})
+    //res.sendFile('/signin.html',{root:__dirname})
+    res.sendFile('/homepage.html',{root:__dirname})
 });
 
 app.get('/signin', (req, res) => {
    //res.send('You are on the sign in page');
-   res.sendFile('views/signin.html', {root:__dirname})
+   res.sendFile('/signin.html', {root:__dirname})
 })
 
 app.get('/signup', (req, res) => {
    //res.send('You are on the sign up page');
-   res.sendFile('views/signup.html', {root:__dirname})
+   res.sendFile('/signup.html', {root:__dirname})
 })
 
 
@@ -75,9 +77,10 @@ app.post("/signup", async (req,res) => {
    const user = req.body.username
    const hashedPassword = await bcrypt.hash(req.body.password,10)
    db.getConnection( async (err, connection) => { if (err) throw (err) 
-      const sqlSearch = "SELECT * FROM userTable WHERE user = ?"
+      const sqlSearch = "SELECT * FROM users WHERE user = ?"
       const search_query = mysql.format(sqlSearch,[user]) 
-      const sqlInsert = "INSERT INTO userTable VALUES (0,?,?)"
+      //const sqlInsert = "INSERT INTO users VALUES (0,?,?)"
+      const sqlInsert = "INSERT INTO users (userid, user, password) VALUES (0,?,?)"
       const insert_query = mysql.format(sqlInsert,[user, hashedPassword])
       // ? will be replaced by values
       // ?? will be replaced by string await 
@@ -106,7 +109,7 @@ app.post("/signup", async (req,res) => {
 app.post("/signin", (req, res)=> {const user = req.body.username
    const password = req.body.password
    db.getConnection ( async (err, connection)=> { if (err) throw (err)
-   const sqlSearch = "Select * from userTable where user = ?"
+   const sqlSearch = "Select * from users where user = ?"
    const search_query = mysql.format(sqlSearch,[user]) 
    await connection.query (search_query, async (err, result) => {  connection.release() 
       if (err) throw (err)  
