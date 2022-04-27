@@ -76,12 +76,18 @@ app.get('/signup', (req, res) => {
 app.post("/signup", async (req,res) => {
    const user = req.body.username
    const hashedPassword = await bcrypt.hash(req.body.password,10)
+   const email = req.body.email
+   const firstname = req.body.firstname
+   const lastname = req.body.lastname
+   const role = req.body.role
+   const balance = req.body.balance
    db.getConnection( async (err, connection) => { if (err) throw (err) 
       const sqlSearch = "SELECT * FROM users WHERE user = ?"
       const search_query = mysql.format(sqlSearch,[user]) 
       //const sqlInsert = "INSERT INTO users VALUES (0,?,?)"
-      const sqlInsert = "INSERT INTO users (userid, user, password) VALUES (0,?,?)"
-      const insert_query = mysql.format(sqlInsert,[user, hashedPassword])
+      //const sqlInsert = "INSERT INTO users (userid, user, password, email) VALUES (0,?,?,?)"
+      const sqlInsert = "INSERT INTO users (userid, first_name, last_name, email, role, user, password, balance) VALUES (0,?,?,?,?,?,?,?)"
+      const insert_query = mysql.format(sqlInsert,[firstname, lastname, email, role, user, hashedPassword, balance])
       // ? will be replaced by values
       // ?? will be replaced by string await 
       connection.query (search_query, async (err, result) => {  if (err) throw (err)
@@ -106,11 +112,13 @@ app.post("/signup", async (req,res) => {
 })
 
 //LOGIN (AUTHENTICATE USER)
-app.post("/signin", (req, res)=> {const user = req.body.username
+app.post("/signin", (req, res)=> {
+   const user = req.body.username
+   const email = req.body.email
    const password = req.body.password
    db.getConnection ( async (err, connection)=> { if (err) throw (err)
-   const sqlSearch = "Select * from users where user = ?"
-   const search_query = mysql.format(sqlSearch,[user]) 
+   const sqlSearch = "Select * from users where email = ?"
+   const search_query = mysql.format(sqlSearch,[email]) 
    await connection.query (search_query, async (err, result) => {  connection.release() 
       if (err) throw (err)  
       if (result.length == 0) {
@@ -124,7 +132,7 @@ app.post("/signin", (req, res)=> {const user = req.body.username
             console.log("---------> Login Successful")
             session=req.session;
             session.userid=req.body.username;
-            res.send(`${user} is logged in!`)
+            res.send(`${email} is logged in!`)
          } 
          else {
             console.log("---------> Password Incorrect")
