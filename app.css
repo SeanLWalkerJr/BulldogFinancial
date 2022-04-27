@@ -3,19 +3,21 @@ html{
 }
 
 body {
-    display: flex;
+    display: block;
     justify-content: center;
     background: linear-gradient(to bottom, rgb(255, 245, 98), rgb(255, 170, 73));
+    margin: auto;
+    padding: auto;
 }
 
 form {
-    display: flex;
+    display: block;
     flex-direction: column;
 }
 
 .input-field {
     position: relative;
-    margin-top: 2rem;
+    margin: 1rem;
 }
 
 .input-field input {
@@ -32,4 +34,9 @@ form input[type="submit"] {
     border-radius: 4px;
     margin-top: 2rem;
     padding: 0.4rem;
+    width: 250px;
+}
+
+input, label {
+    display:block;
 }

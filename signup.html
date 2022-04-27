@@ -4,14 +4,36 @@
     <title>Bulldog Login</title>
 </head>
 <body>
-  <h1 style="text-align:center;">Bulldog Login</h1>
+  <h1 style="text-align:center;">Bulldog Sign Up</h1>
   <center><img src="bulldoglogo.png" alt="Bulldog Logo" width="100" height="100" style="text-align:center;" display: block></center>
-    <form action="/signup" method="post">
-        <h2>Sign Up</h2>
+  <center>
+  <form action="/signup" method="post">
+      <div class="input-field">
+        <label for="firstname">First Name:</label>
+        <input type="text" name="firstname" id="firstname" placeholder="Enter First Name">
+      </div>
+      <div class="input-field">
+        <label for="firstname">Last Name:</label>
+        <input type="text" name="lastname" id="lastname" placeholder="Enter Last Name">
+      </div>
+      <div class="input-field">
+        <label for="email">Email:</label>
+        <input type="text" name="email" id="email" placeholder="Enter Email Address">
+      </div>
+      <div class="input-field">
+        <label for="accounttype">Role:</label>
+        <select id="role" name="role">
+          <option value="customer">Customer</option>
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+        </select> 
+      </div>
         <div class="input-field">
+          <label for="username">Username:</label>
             <input type="text" name="username" id="username" placeholder="Enter BSU Email">
         </div>
         <div class="input-field">
+          <label for="password">Password:</label>
             <input type="password" name="password" id="password" placeholder="Enter Password">
         </div>
         <input name="submitbuton" type="submit" value="Sign Up">
@@ -19,6 +41,7 @@
     <form action="/signin" method="get">
         <input type="submit" value="Sign In" />
     </form>    
+  </center>
     
 </body>
 </html>
