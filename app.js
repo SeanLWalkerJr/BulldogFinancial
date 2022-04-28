@@ -71,10 +71,11 @@ app.get('/signup', (req, res) => {
 })
 
 app.get('/landingpage', function(req, res) {
-	// If the user is loggedin
+   // If the user is loggedin
 	if (req.session.loggedin) {
-		// Output username
-		res.sendFile('/landingpage.html');
+		// Go to view balance page
+		//res.sendFile('/viewbalance.html', {root:__dirname});
+      res.sendFile('/landingpage.html',{root:__dirname});
 	} else {
 		// Not logged in
 		res.send("Please <a href= '\signin.html'>login</a> to view this page!");
@@ -83,10 +84,32 @@ app.get('/landingpage', function(req, res) {
 });
 
 app.post('/logout',(req,res) => {
+   req.session.loggedin = false;
    req.session.destroy();
    res.redirect('/');
 });
 
+
+app.get('/viewbalance',(req, res) => {
+   // If the user is loggedin
+	if (req.session.loggedin) {
+		// Go to view balance page
+		//res.sendFile('/viewbalance.html', {root:__dirname});
+      res.sendFile('/viewbalance.html',{root:__dirname});
+	} else {
+		// Not logged in
+		res.send("Please <a href= '\signin.html'>login</a> to view this page!");
+	}
+	res.end();
+});
+
+app.post('/viewbalance',(req, res) => {
+      res.sendFile('/viewbalance.html',{root:__dirname});
+});
+
+app.post('/landingpage',(req, res) => {
+      res.sendFile('/landingpage.html',{root:__dirname});
+});
 
 //middleware to read req.body.<params>
 //CREATE USER
@@ -147,6 +170,7 @@ app.post("/signin", (req, res)=> {
          //get the hashedPassword from result    
          if (await bcrypt.compare(password, hashedPassword)) {
             console.log("---------> Login Successful")
+            req.session.loggedin=true;
             session=req.session;
             session.userid=req.body.username;
             //res.send(`${email} is logged in!`)
