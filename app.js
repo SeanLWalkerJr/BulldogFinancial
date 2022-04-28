@@ -132,7 +132,8 @@ app.post("/signin", (req, res)=> {
             console.log("---------> Login Successful")
             session=req.session;
             session.userid=req.body.username;
-            res.send(`${email} is logged in!`)
+            //res.send(`${email} is logged in!`)
+            res.sendFile('/landingpage.html', {root:__dirname})
          } 
          else {
             console.log("---------> Password Incorrect")
