@@ -70,6 +70,23 @@ app.get('/signup', (req, res) => {
    res.sendFile('/signup.html', {root:__dirname})
 })
 
+app.get('/landingpage', function(req, res) {
+	// If the user is loggedin
+	if (req.session.loggedin) {
+		// Output username
+		res.sendFile('/landingpage.html');
+	} else {
+		// Not logged in
+		res.send("Please <a href= '\signin.html'>login</a> to view this page!");
+	}
+	res.end();
+});
+
+app.post('/logout',(req,res) => {
+   req.session.destroy();
+   res.redirect('/');
+});
+
 
 //middleware to read req.body.<params>
 //CREATE USER
