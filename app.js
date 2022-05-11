@@ -93,38 +93,10 @@ app.post('/logout',(req,res) => {
    res.redirect('/');
 });
 
-/*
-app.get('/viewbalance',(req, res) => {
-   // If the user is loggedin
-	if (req.session.loggedin) {
-		// Go to view balance page
-		//res.sendFile('/viewbalance.html', {root:__dirname});
-      res.sendFile('/viewbalance.html',{root:__dirname});
-	} else {
-		// Not logged in
-		res.send("Please <a href= '\signin.html'>login</a> to view this page!");
-	}
-	res.end();
-});
-*/
 app.post('/viewbalance',(req, res) => {
    db.getConnection ( async (err, connection)=> { if (err) throw (err)
       const sqlSearch = "Select * from users where email = ?"
       const search_query = mysql.format(sqlSearch,[session.userid])
-      /* 
-      connection.query(search_query, function(error, data)
-      {
-         if(error)
-         {
-            throw error;
-         }
-         else
-         {
-            response.render('/viewbalance', {balance: data});
-         }
-         
-      });
-      */
      
       
       await connection.query (search_query, async (err, result) => 
@@ -161,34 +133,46 @@ app.post("/signup", async (req,res) => {
    const lastname = req.body.lastname
    const role = req.body.role
    const balance = req.body.balance
-   db.getConnection( async (err, connection) => { if (err) throw (err) 
-      const sqlSearch = "SELECT * FROM users WHERE user = ?"
-      const search_query = mysql.format(sqlSearch,[user]) 
-      //const sqlInsert = "INSERT INTO users VALUES (0,?,?)"
-      //const sqlInsert = "INSERT INTO users (userid, user, password, email) VALUES (0,?,?,?)"
-      const sqlInsert = "INSERT INTO users (userid, first_name, last_name, email, role, user, password, balance) VALUES (0,?,?,?,?,?,?,?)"
-      const insert_query = mysql.format(sqlInsert,[firstname, lastname, email, role, user, hashedPassword, balance])
-      // ? will be replaced by values
-      // ?? will be replaced by string await 
-      connection.query (search_query, async (err, result) => {  if (err) throw (err)
-      console.log("------> Search Results")
-      console.log(result.length)  
-      if (result.length != 0) {
-         connection.release()
-         console.log("------> User already exists")
-         res.sendStatus(409) 
-      } 
-      else {
-         await connection.query (insert_query, (err, result)=> {   
-            connection.release() 
-            if (err) throw (err)
-            console.log ("--------> Created new User")
-            console.log(result.insertId)
-            res.sendStatus(201)
-         }) //end of connection.query()
-      }
-   }) //end of db.getConnection
- })  //end of app.post()
+   if(Object.keys(email).length === 0 | Object.keys(req.body.password).length === 0 
+   |Object.keys(user).length === 0 | Object.keys(firstname).length === 0
+   |Object.keys(lastname).length === 0 | Object.keys(role).length === 0
+   |Object.keys(balance).length === 0
+   ) 
+   {
+      res.send('<script>alert("Please fill empty fields."); window.location.href = "/signup"; </script>')
+   }
+   else
+   {
+      db.getConnection( async (err, connection) => { if (err) throw (err) 
+         const sqlSearch = "SELECT * FROM users WHERE user = ?"
+         const search_query = mysql.format(sqlSearch,[user]) 
+         //const sqlInsert = "INSERT INTO users VALUES (0,?,?)"
+         //const sqlInsert = "INSERT INTO users (userid, user, password, email) VALUES (0,?,?,?)"
+         const sqlInsert = "INSERT INTO users (userid, first_name, last_name, email, role, user, password, balance) VALUES (0,?,?,?,?,?,?,?)"
+         const insert_query = mysql.format(sqlInsert,[firstname, lastname, email, role, user, hashedPassword, balance])
+         // ? will be replaced by values
+         // ?? will be replaced by string await 
+         connection.query (search_query, async (err, result) => {  if (err) throw (err)
+         console.log("------> Search Results")
+         console.log(result.length)  
+         if (result.length != 0) {
+            connection.release()
+            console.log("------> User already exists")
+            res.sendStatus(409) 
+         } 
+         else {
+            await connection.query (insert_query, (err, result)=> {   
+               connection.release() 
+               if (err) throw (err)
+               console.log ("--------> Created new User")
+               console.log(result.insertId)
+               res.sendStatus(201)
+            }) //end of connection.query()
+         }
+      }) //end of db.getConnection
+      }) 
+   }
+    //end of app.post()
 });
 
 //LOGIN (AUTHENTICATE USER)
@@ -196,34 +180,43 @@ app.post("/signin", (req, res)=> {
    const user = req.body.username
    const email = req.body.email
    const password = req.body.password
-   db.getConnection ( async (err, connection)=> { if (err) throw (err)
-   const sqlSearch = "Select * from users where email = ?"
-   const search_query = mysql.format(sqlSearch,[email]) 
-   await connection.query (search_query, async (err, result) => {  connection.release() 
-      if (err) throw (err)  
-      if (result.length == 0) {
-         console.log("--------> User does not exist")
-         res.sendStatus(404)
-      } 
-      else {
-         const hashedPassword = result[0].password
-         //get the hashedPassword from result    
-         if (await bcrypt.compare(password, hashedPassword)) {
-            console.log("---------> Login Successful")
-            req.session.loggedin=true;
-            session=req.session;
-            session.userid=req.body.email;
-            //session.email = req.body.email;
-            //res.send(`${email} is logged in!`)
-            res.sendFile('/landingpage.html', {root:__dirname})
-         } 
-         else {
-            console.log("---------> Password Incorrect")
-            res.send("Password incorrect!")
-         } //end of bcrypt.compare()  
-      }//end of User exists i.e. results.length==0 
-   }) //end of connection.query()}) //end of db.connection()
-   }) //end of app.post()
+   if(Object.keys(email).length === 0 | Object.keys(password).length === 0)
+   {
+      res.send('<script>alert("Please fill empty fields."); window.location.href = "/signin"; </script>')
+   }
+   else
+   {
+      db.getConnection ( async (err, connection)=> { if (err) throw (err)
+         const sqlSearch = "Select * from users where email = ?"
+         const search_query = mysql.format(sqlSearch,[email]) 
+         await connection.query (search_query, async (err, result) => {  connection.release() 
+            if (err) throw (err)  
+            if (result.length == 0) {
+               console.log("--------> User does not exist")
+               res.send('<script>alert("That user does not exist. Be sure to enter your EMAIL and not your USERNAME"); window.location.href = "/signin"; </script>')
+               //res.sendStatus(404)
+            } 
+            else {
+               const hashedPassword = result[0].password
+               //get the hashedPassword from result    
+               if (await bcrypt.compare(password, hashedPassword)) {
+                  console.log("---------> Login Successful")
+                  req.session.loggedin=true;
+                  session=req.session;
+                  session.userid=req.body.email;
+                  //session.email = req.body.email;
+                  //res.send(`${email} is logged in!`)
+                  res.sendFile('/landingpage.html', {root:__dirname})
+               } 
+               else {
+                  console.log("---------> Password Incorrect")
+                  res.send('<script>alert("That password is incorrect."); window.location.href = "/signin"; </script>')
+               } //end of bcrypt.compare()  
+            }//end of User exists i.e. results.length==0 
+         }) //end of connection.query()}) //end of db.connection()
+         }) //end of app.post()
+
+   }
 });
 
 //const generateAccessToken = require("./generateAccessToken")
