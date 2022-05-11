@@ -24,7 +24,8 @@ db.getConnection( (err, connection)=> {   if (err) throw (err)
 app.listen(port, 
       ()=> console.log(`Server Started on port ${port}...`))
 
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const { response } = require("express");
 
 // creating 24 hours from milliseconds
 const oneDay = 1000 * 60 * 60 * 24;
@@ -50,6 +51,9 @@ app.use(cookieParser());
 // a variable to save a session
 var session;
 
+//app.engine('html', require('ejs').renderFile);
+app.set('views',  __dirname + '/views');
+app.set('view engine', 'ejs');
 app.get('/',(req,res) => {
     session=req.session;
     if(session.userid){
@@ -89,7 +93,7 @@ app.post('/logout',(req,res) => {
    res.redirect('/');
 });
 
-
+/*
 app.get('/viewbalance',(req, res) => {
    // If the user is loggedin
 	if (req.session.loggedin) {
@@ -102,10 +106,46 @@ app.get('/viewbalance',(req, res) => {
 	}
 	res.end();
 });
-
+*/
 app.post('/viewbalance',(req, res) => {
-      res.sendFile('/viewbalance.html',{root:__dirname});
-});
+   db.getConnection ( async (err, connection)=> { if (err) throw (err)
+      const sqlSearch = "Select * from users where email = ?"
+      const search_query = mysql.format(sqlSearch,[session.userid])
+      /* 
+      connection.query(search_query, function(error, data)
+      {
+         if(error)
+         {
+            throw error;
+         }
+         else
+         {
+            response.render('/viewbalance', {balance: data});
+         }
+         
+      });
+      */
+     
+      
+      await connection.query (search_query, async (err, result) => 
+      {connection.release() 
+         if (err) throw (err)  
+         if (result.length == 0) 
+         {
+            console.log("--------> User does not exist")
+            console.log(session.userid)
+            res.sendStatus(404)
+         } 
+         else 
+         {
+            res.render('viewbalance', {balance: result[0]})
+            //res.render('/viewbalance', {title: 'Balance', balance: result})
+         }//end of User exists i.e. results.length==0 
+      }) //end of connection.query()}) //end of db.connection()
+      })
+      //res.sendFile('/viewbalance.html',{root:__dirname});
+      
+});//});
 
 app.post('/landingpage',(req, res) => {
       res.sendFile('/landingpage.html',{root:__dirname});
@@ -149,7 +189,7 @@ app.post("/signup", async (req,res) => {
       }
    }) //end of db.getConnection
  })  //end of app.post()
-})
+});
 
 //LOGIN (AUTHENTICATE USER)
 app.post("/signin", (req, res)=> {
@@ -172,7 +212,8 @@ app.post("/signin", (req, res)=> {
             console.log("---------> Login Successful")
             req.session.loggedin=true;
             session=req.session;
-            session.userid=req.body.username;
+            session.userid=req.body.email;
+            //session.email = req.body.email;
             //res.send(`${email} is logged in!`)
             res.sendFile('/landingpage.html', {root:__dirname})
          } 
@@ -183,33 +224,42 @@ app.post("/signin", (req, res)=> {
       }//end of User exists i.e. results.length==0 
    }) //end of connection.query()}) //end of db.connection()
    }) //end of app.post()
-})
-   
+});
+
 //const generateAccessToken = require("./generateAccessToken")
 //import the generateAccessToken function//LOGIN (AUTHENTICATE USER, and return accessToken)
+
 /*
 app.post("/login", (req, res)=> {const user = req.body.name
-const password = req.body.passworddb.getConnection ( async (err, connection)=> {if (err) throw (err)
- const sqlSearch = "Select * from userTable where user = ?"
- const search_query = mysql.format(sqlSearch,[user])
- await connection.query (search_query, async (err, result) => {connection.release()
-  
-  if (err) throw (err)
-  if (result.length == 0) {
-   console.log("--------> User does not exist")
-   res.sendStatus(404)
-  } 
-  else {
-   const hashedPassword = result[0].password
-   //get the hashedPassword from result
-   if (await bcrypt.compare(password, hashedPassword)) {
-    console.log("---------> Login Successful")
-    console.log("---------> Generating accessToken")
-    const token = generateAccessToken({user: user})   
-    console.log(token)
-    res.json({accessToken: token})
-   } else {
-    res.send("Password incorrect!")
-   }}}) //end of Password incorrect}//end of User exists}) //end of connection.query()}) //end of db.connection()}) //end of app.post()
-})})
+   const password = req.body.passworddb.getConnection ( async (err, connection)=> {if (err) throw (err)
+      const sqlSearch = "Select * from userTable where user = ?"
+      const search_query = mysql.format(sqlSearch,[user])
+      await connection.query (search_query, async (err, result) => {connection.release()
+         if (err) throw (err)
+         if (result.length == 0) 
+         {
+            console.log("--------> User does not exist")
+            res.sendStatus(404)
+         } 
+         else 
+         {
+            const hashedPassword = result[0].password
+            //get the hashedPassword from result
+            if (await bcrypt.compare(password, hashedPassword)) 
+            {
+            console.log("---------> Login Successful")
+            console.log("---------> Generating accessToken")
+            const token = generateAccessToken({user: user})   
+            console.log(token)
+            res.json({accessToken: token})
+            } 
+            else 
+            {
+            res.send("Password incorrect!")
+            }
+         }
+      }) //end of Password incorrect}//end of User exists}) //end of connection.query()}) //end of db.connection()}) //end of app.post()
+   })
+});
+
 */
