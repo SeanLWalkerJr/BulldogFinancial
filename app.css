@@ -10,12 +10,16 @@ body {
     padding: auto;
 }
 
-form {
-    display: block;
-    flex-direction: column;
+
+
+#form-container
+{
+    justify-content: center;
+    padding: auto;
 }
 
 .input-field {
+    justify-content: center;
     position: relative;
     margin: 1rem;
 }
@@ -35,8 +39,10 @@ form input[type="submit"] {
     margin-top: 2rem;
     padding: 0.4rem;
     width: 250px;
+    justify-content: center;
 }
 
 input, label {
     display:block;
+    justify-content: center;
 }
