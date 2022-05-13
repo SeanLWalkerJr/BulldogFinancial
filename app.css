@@ -1,0 +1,48 @@
+html{
+    min-height: 100%;
+}
+
+body {
+    display: block;
+    justify-content: center;
+    background: linear-gradient(to bottom, rgb(255, 245, 98), rgb(255, 170, 73));
+    margin: auto;
+    padding: auto;
+}
+
+
+
+#form-container
+{
+    justify-content: center;
+    padding: auto;
+}
+
+.input-field {
+    justify-content: center;
+    position: relative;
+    margin: 1rem;
+}
+
+.input-field input {
+    padding: 0.8rem;
+}
+
+form .input-field:first-child {
+    margin-bottom: 1.5rem;
+}
+
+form input[type="submit"] {
+    background: linear-gradient(to left, #e66747, #e9e754);
+    color: white;
+    border-radius: 4px;
+    margin-top: 2rem;
+    padding: 0.4rem;
+    width: 250px;
+    justify-content: center;
+}
+
+input, label {
+    display:block;
+    justify-content: center;
+}
